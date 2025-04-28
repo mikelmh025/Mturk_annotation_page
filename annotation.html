@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Test</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .optionContainer {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            width: 95%;
+            overflow-x: scroll;
+            padding-bottom: 1rem;
+        }
+
+        .optionContainer img {
+            height: 9rem;
+            width: 9rem;
+            margin: 0 8px;
+            padding: 1rem;
+            border-radius: 0.25rem;
+            border: 1px solid white;
+        }
+
+        .optionContainer figcaption {
+            font-size: 14px;
+            text-align: center;
+            padding-top: 5px;
+            /* color: #888; */
+            }
+
+
+
+        .optionContainer img:hover {
+            border-color: black;
+        }
+
+        .optionContainer img:focus {
+            border: 2px solid #78A55A;
+        }
+
+
+        .buttonGroup{
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 50%;
+        }
+
+        button {
+            margin-top: 4rem;
+            padding: 0.75rem 3rem;
+            border: none;
+            background-color: #78A55A;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            color: white
+        }
+
+        .prevButton{
+            background-color: black;
+        }
+
+        button:disabled {
+            background-color: #CCC;
+        }
+
+        .optionContainer .selected {
+            border: 2px solid #78A55A;
+        }
+
+        .hide {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <head>
+        <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+        <script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script>
+    </head>
+
+   
+
+    <script>
+        // <crowd-form></crowd-form>
+
+
+        // Online mode
+        // input_dict = "${input_dict}"
+        // input_dict = JSON.parse(input_dict.replace(/'/g, '"'));
+
+        
+
+        // Local debug mode
+        input_dict = {'0': {'task': 'Color: <b>Red</b>, Material: <b>hemp</b>, Pattern: <b>Solid</b>', 'instruction': 'Please find <b>2</b> or more images of <b>T-shirt</b> with:', 
+                            'examples': {'215160': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s', 
+                                         '215175': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s', 
+                                         '215179': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s'
+                                        }, 
+                            'color': 'Red', 
+                            'material': 'hemp', 
+                            'pattern': 'Solid', 
+                            'class': 'T-shirt', 
+                            'batch_id': '8'},
+                        '1': {'task': 'Color: <b>Red</b>, Material: <b>hemp</b>, Pattern: <b>Solid</b>', 'instruction': 'Please find <b>2</b> or more images of <b>T-shirt</b> with:', 
+                            'examples': {'215160': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s', 
+                                         '215175': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s', 
+                                         '215179': 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT8sbH-eax-Z_6uNPmkuRX7WRWcAtn7s4WlLw&s'
+                                        }, 
+                            'color': 'Red', 
+                            'material': 'hemp', 
+                            'pattern': 'Solid', 
+                            'class': 'T-shirt', 
+                            'batch_id': '8'}
+                        
+                        }
+
+        var minimum_selection = 2;
+        
+        var result = {'timer': {}, 'answer': {}};
+        let no_image_str = "zzzz"
+        var enable_option_capture = false;
+
+
+
+        console.log(input_dict);
+
+        // Initial variables
+        var group_count = 0;
+        var start_time = new Date().getTime();
+
+        // Parse input_dict
+        for (const [key, value] of Object.entries(input_dict)) {
+            group_count += 1;
+        }
+        // var option_count = option_names.length;
+        
+
+
+        // Generate HTLM elements by JS script
+        for (let i=0; i<group_count; i++){
+            group_id = i+1;
+
+            const containerDiv = document.createElement("div");
+            containerDiv.classList.add("container");
+            containerDiv.id = "group"+group_id;
+            document.body.appendChild(containerDiv);
+
+            // Hide all containers except the first one
+            if (i !== 0){
+                containerDiv.classList.add("hide");
+            }
+
+            // const h1 = document.createElement("h1");
+            // h1.innerHTML = "<b>Task : " + (i+1) + " / " + group_count + "</b>";
+            // containerDiv.appendChild(h1);
+
+            // const img = document.createElement("img");
+            // [img.src, img.alt, img.width] = [input_dict[i]['task'], "main", "200"];
+            // img.classList.add("mainImg");
+            // containerDiv.appendChild(img);
+
+            const instruction = document.createElement("p");
+            var task_count_string =  "<b>[Task " + (i+1) + " / " + group_count + "]</b>";
+            instruction.innerHTML = task_count_string + " " + input_dict[i]['instruction']; // it can be task or instruction
+            instruction.style.fontSize = "25px";
+            containerDiv.appendChild(instruction);
+
+            
+
+            const task = document.createElement("p");
+            task.innerHTML = input_dict[i]['task']; // it can be task or instruction
+            task.style.fontSize = "25px";
+            containerDiv.appendChild(task);
+            
+            const instruction2 = document.createElement("p");
+            instruction2.innerHTML = 'If you are not familiar with the any of these key words, feel free to search it on Google.\n \nTry your best to find the most relevant images. I am genuinely interested in your opinion and generous in accepting your answers.'
+            containerDiv.appendChild(instruction2);
+
+
+            const optionContainer = document.createElement("div");
+            optionContainer.classList.add("optionContainer");
+            containerDiv.appendChild(optionContainer);
+
+            option_names = Object.keys(input_dict[i].examples);
+
+            const rows_count = 3
+            const numRows = Math.ceil(option_names.length / rows_count); // Calculate the number of rows needed
+
+            for (let row = 0; row < numRows; row++) {
+                const rowContainer = document.createElement("div");
+                rowContainer.classList.add("rowContainer"); // You can style this class to control the layout
+                optionContainer.appendChild(rowContainer);
+
+                const startIndex = row * rows_count;
+                const endIndex = Math.min(startIndex + rows_count, option_names.length);
+
+                for (let j = startIndex; j < endIndex; j++) {
+                    if (input_dict[i].examples[option_names[j]] == no_image_str) {
+                    continue;
+                    }
+
+                    const img = document.createElement("img");
+                    [img.src, img.alt] = [input_dict[i].examples[option_names[j]], option_names[j]];
+                    img.classList.add(option_names[j]);
+
+                    const figcaption = document.createElement("figcaption");
+                    figcaption.textContent = option_names[j];
+
+                    const figure = document.createElement("div"); // sub figure: img + figcaption
+                    figure.appendChild(img);
+                    if (enable_option_capture) {
+                    figure.appendChild(figcaption);
+                    }
+
+                    rowContainer.appendChild(figure);                    
+                }
+            }
+
+
+
+            const buttonGroup = document.createElement("div");
+            buttonGroup.classList.add("buttonGroup");
+            containerDiv.appendChild(buttonGroup);
+
+            const prevButton = document.createElement("button");
+            prevButton.classList.add("prevButton");
+            prevButton.innerHTML = "Previous task";
+            if(i == 0){prevButton.disabled = true};
+            // prevButton.disabled = true
+            buttonGroup.appendChild(prevButton);
+
+
+            if (i == group_count-1){
+                const submitButton = document.createElement("button");
+                submitButton.classList.add("submitButton");
+                submitButton.innerHTML = "Submit";
+                submitButton.disabled = true;
+                buttonGroup.appendChild(submitButton);
+                continue;
+            } else{
+                const nextButton = document.createElement("button");
+                nextButton.classList.add("nextButton");
+                nextButton.innerHTML = "Next task";
+                nextButton.disabled = true;
+                buttonGroup.appendChild(nextButton);
+            }
+
+    
+        }
+
+        // Link html elements to groups of JS variables
+        var groups = [];
+        for (let i=0; i<group_count; i++){
+            cur_group = document.getElementById('group'+(i+1));
+            cur_optionGroup = cur_group.querySelector('.optionContainer');
+            cur_imgGroup = cur_group.querySelectorAll('img');
+            cur_next = cur_group.querySelector('.nextButton');
+            cur_prev = cur_group.querySelector('.prevButton');
+
+            if (i == group_count-1){
+                cur_next = cur_group.querySelector('.submitButton');
+            }
+
+            // Hide null options
+            cur_imgGroup.forEach((item)=>{
+                const id = item.src.split('/').pop();
+                if (id === no_image_str) { // no_image_str = zzzz
+                    item.classList.add('hide');
+                }
+            });
+
+            groups.push({
+                group: cur_group,
+                optionGroup: cur_optionGroup,
+                imgGroup: cur_imgGroup,
+                next: cur_next,
+                prev: cur_prev,
+                selected: null
+            });
+
+        }
+
+        // Link listerners to buttons
+        for (let i=0; i<group_count; i++){
+            // Link next button
+            if (i != group_count-1){
+                groups[i].next.addEventListener('click', function(){
+
+                    // Update timer
+                    if (result['timer']['group'+(i+1)] == null){
+                        result['timer']['group'+(i+1)] = Date.now() - start_time;
+                    } else{
+                        result['timer']['group'+(i+1)] += Date.now() - start_time;
+                    }
+                    start_time = Date.now();
+
+                    // Hide all except next one
+                    for (let j=0; j<group_count; j++){
+                        if (j != i+1){
+                            groups[j].group.classList.add('hide');
+                        } else {
+                            groups[j].group.classList.remove('hide');
+                        }
+                    }
+                });
+            } else{
+                // Submit button
+                groups[i].next.addEventListener('click', function(){
+                    // Update timer
+                    if (result['timer']['group'+(i+1)] == null){
+                        result['timer']['group'+(i+1)] = Date.now() - start_time;
+                    } else{
+                        result['timer']['group'+(i+1)] += Date.now() - start_time;
+                    }
+                    start_time = Date.now();
+
+                    console.log("result", result)
+                    if (result) {
+                        const urlParams = new URLSearchParams(window.location.search)
+
+                        // create the form element and point it to the correct endpoint
+                        const form = document.createElement('form')
+
+                        console.log('turkSubmitTo: ', urlParams.get('turkSubmitTo'))
+
+                        form.action = (new URL('mturk/externalSubmit', urlParams.get('turkSubmitTo'))).href
+                        // form.action = (new URL('mturk/externalSubmit', 'https://www.mturk.com/')).href
+                        form.method = 'post'
+
+                        // attach the assignmentId
+                        const inputAssignmentId = document.createElement('input')
+                        inputAssignmentId.name = 'assignmentId'
+                        inputAssignmentId.value = urlParams.get('assignmentId')
+                        inputAssignmentId.hidden = true
+                        form.appendChild(inputAssignmentId)
+
+                        // Attach the data I want to send back
+                        const inputCoordinates = document.createElement('input')
+                        inputCoordinates.name = 'result'
+                        inputCoordinates.value = JSON.stringify(result);
+                        inputCoordinates.hidden = true
+                        form.appendChild(inputCoordinates)
+
+                        // attach the form to the HTML document and trigger submission
+                        document.body.appendChild(form)
+                        form.submit()
+                    }
+                })
+            }
+
+            // Link prev button
+            groups[i].prev.addEventListener('click', function(){
+                // Update timer
+                if (result['timer']['group'+(i+1)] == null){
+                    result['timer']['group'+(i+1)] = Date.now() - start_time;
+                } else{
+                    result['timer']['group'+(i+1)] += Date.now() - start_time;
+                }
+                start_time = Date.now();
+
+                // Hide all except next one
+                for (let j=0; j<group_count; j++){
+                    if (j != i-1){
+                        groups[j].group.classList.add('hide');
+                    } else {
+                        groups[j].group.classList.remove('hide');
+                    }
+                }
+            });
+
+            // // Link optionGroup: Deal with click on the image to select
+            // groups[i].optionGroup.addEventListener("click", () => {
+            //     groups[i].imgGroup.forEach((item) => item.classList.remove('selected'));
+            //     event.target.classList.add('selected');
+            //     result['answer']['group'+(i+1)] = event.target.alt;
+            //     groups[i].next.disabled = false;
+
+            //     // Check if all groups are selected
+            //     var all_selected = true;
+            //     for (let j=0; j<group_count; j++){
+            //         if (result['answer']['group'+(j+1)] == null){
+            //             all_selected = false;
+            //         }
+            //     }
+            //     if (all_selected){
+            //         groups[group_count-1].next.disabled = false;
+            //     } else{
+            //         groups[group_count-1].next.disabled = true;
+            //     }
+            // })
+
+            // Link optionGroup: Deal with click on the image to select
+            groups[i].optionGroup.addEventListener("click", (event) => {
+                event.target.classList.toggle('selected'); // Toggle the selected class
+
+                // Update the selected options in the result object
+                result['answer']['group'+(i+1)] = [];
+                const selectedOptions = groups[i].optionGroup.getElementsByClassName('selected');
+                for (let j = 0; j < selectedOptions.length; j++) {
+                    result['answer']['group'+(i+1)].push(selectedOptions[j].alt);
+                }
+
+                groups[i].next.disabled = selectedOptions.length < minimum_selection; // Enable the next button if at least 4 options are selected
+
+                // Check if all groups are selected
+                let all_selected = true;
+                for (let j = 0; j < group_count; j++) {
+                    if (!result['answer']['group'+(j+1)] || result['answer']['group'+(j+1)].length < minimum_selection) {
+                        all_selected = false;
+                        break;
+                    }
+                }
+
+                groups[group_count-1].next.disabled = !all_selected; // Enable/disable the next button based on all groups being selected
+            });
+
+        }
+
+        
+
+    </script>
+</body>
+
+</html>
